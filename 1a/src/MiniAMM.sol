@@ -37,6 +37,6 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
         }
     }
 
-    // complete the function
+    // complete the function >> this is for tradding
     function swap(uint256 xAmountIn, uint256 yAmountIn) external {}
 }

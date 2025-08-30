@@ -20,12 +20,13 @@ contract MiniAMMTest is Test {
     event AddLiquidity(uint256 xAmountIn, uint256 yAmountIn);
     event Swap(uint256 xAmountIn, uint256 yAmountIn);
 
+    // setUp method is not for call 
     function setUp() public {
         // Deploy mock tokens
         token0 = new MockERC20("Token A", "TKA");
         token1 = new MockERC20("Token B", "TKB");
 
-        // Deploy MiniAMM with the tokens
+        // Deploy MiniAMM with the tokens this is at local env
         miniAMM = new MiniAMM(address(token0), address(token1));
 
         // Mint tokens to test addresses
@@ -37,7 +38,7 @@ contract MiniAMMTest is Test {
         token1.freeMintTo(10000 * 10 ** 18, charlie);
 
         // Approve tokens for MiniAMM
-        vm.startPrank(alice);
+        vm.startPrank(alice); // act like alice
         token0.approve(address(miniAMM), type(uint256).max);
         token1.approve(address(miniAMM), type(uint256).max);
         vm.stopPrank();
