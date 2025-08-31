@@ -62,6 +62,11 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
 
     // complete the function
     function addLiquidity(uint256 xAmountIn, uint256 yAmountIn) external {
+        // amount check
+        if(xAmountIn == 0 || yAmountIn == 0) {
+            revert("Amounts must be greater than 0");
+        }
+
         if (k == 0) {
             // add params
             _addLiquidityFirstTime(xAmountIn,yAmountIn);
@@ -74,5 +79,8 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
     }
 
     // complete the function >> this is for tradding
-    function swap(uint256 xAmountIn, uint256 yAmountIn) external {}
+    function swap(uint256 xAmountIn, uint256 yAmountIn) external {
+
+        emit Swap(xAmountIn, yAmountIn);
+    }
 }
