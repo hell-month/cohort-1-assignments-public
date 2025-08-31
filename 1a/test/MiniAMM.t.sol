@@ -40,6 +40,7 @@ contract MiniAMMTest is Test {
 
         // Approve tokens for MiniAMM
         vm.startPrank(alice); // act like alice
+        // approve must be call at client side not in contract -> change personal related info
         token0.approve(address(miniAMM), type(uint256).max);
         token1.approve(address(miniAMM), type(uint256).max);
         vm.stopPrank();
