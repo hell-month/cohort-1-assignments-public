@@ -6,7 +6,6 @@ import {console} from "forge-std/console.sol";
 import {MiniAMM} from "../src/MiniAMM.sol";
 import {IMiniAMMEvents} from "../src/IMiniAMM.sol";
 import {MockERC20} from "../src/MockERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract MiniAMMTest is Test {
     MiniAMM public miniAMM;
