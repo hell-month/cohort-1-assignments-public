@@ -35,21 +35,25 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
 
     // add parameters and implement function.
     // this function will determine the initial 'k'.
-    function _addLiquidityFirstTime() internal {}
+    function _addLiquidityFirstTime(uint256 xAmountIn, uint256 yAmountIn) internal {
+        k = xAmountIn * yAmountIn ;
+    }
 
     // add parameters and implement function.
     // this function will increase the 'k'
     // because it is transferring liquidity from users to this contract.
-    function _addLiquidityNotFirstTime() internal {}
+    function _addLiquidityNotFirstTime(uint256 xAmountIn, uint256 yAmountIn) internal {
+        
+    }
 
     // complete the function
     function addLiquidity(uint256 xAmountIn, uint256 yAmountIn) external {
         if (k == 0) {
             // add params
-            _addLiquidityFirstTime();
+            _addLiquidityFirstTime(xAmountIn,yAmountIn);
         } else {
             // add params
-            _addLiquidityNotFirstTime();
+            _addLiquidityNotFirstTime(xAmountIn,yAmountIn);
         }
     }
 
