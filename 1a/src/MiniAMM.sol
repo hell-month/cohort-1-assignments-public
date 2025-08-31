@@ -43,7 +43,7 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
         xReserve = xAmountIn;
         yReserve = yAmountIn;
 
-        k = xAmountIn * yAmountIn ;
+        k = xReserve * yReserve ;
     }
 
     // add parameters and implement function.
@@ -51,6 +51,13 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
     // because it is transferring liquidity from users to this contract.
     function _addLiquidityNotFirstTime(uint256 xAmountIn, uint256 yAmountIn) internal {
         
+        IERC20(tokenX).transferFrom(msg.sender,address(this),xAmountIn);
+        IERC20(tokenY).transferFrom(msg.sender,address(this),yAmountIn);
+
+        xReserve += xAmountIn;
+        yReserve += yAmountIn;
+
+        k = xReserve * yReserve ;
     }
 
     // complete the function

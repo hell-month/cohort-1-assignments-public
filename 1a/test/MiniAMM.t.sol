@@ -113,23 +113,21 @@ contract MiniAMMTest is Test {
         uint256 aliceToken0Before = token0Actual.balanceOf(alice);
         uint256 aliceToken1Before = token1Actual.balanceOf(alice);
 
-        // 컨트랙트 쪽이 아니라 사용자 쪽에서 승인을 호출 -> 계좌 잔고가 줄어들게 허용
-        IERC20(miniAMM.tokenX()).approve(address(miniAMM), xAmount);
-        IERC20(miniAMM.tokenY()).approve(address(miniAMM), yAmount);
+        
         miniAMM.addLiquidity(xAmount, yAmount);
 
         // Check that tokens were transferred (xAmount and yAmount correspond to token0 and token1)
         assertEq(token0Actual.balanceOf(alice), aliceToken0Before - xAmount);
         assertEq(token1Actual.balanceOf(alice), aliceToken1Before - yAmount);
 
-        // // Check that MiniAMM received the tokens
-        // assertEq(token0Actual.balanceOf(address(miniAMM)), xAmount);
-        // assertEq(token1Actual.balanceOf(address(miniAMM)), yAmount);
+        // Check that MiniAMM received the tokens
+        assertEq(token0Actual.balanceOf(address(miniAMM)), xAmount);
+        assertEq(token1Actual.balanceOf(address(miniAMM)), yAmount);
 
-        // // Check that reserves and k were set correctly
-        // assertEq(miniAMM.xReserve(), xAmount);
-        // assertEq(miniAMM.yReserve(), yAmount);
-        // assertEq(miniAMM.k(), xAmount * yAmount);
+        // Check that reserves and k were set correctly
+        assertEq(miniAMM.xReserve(), xAmount);
+        assertEq(miniAMM.yReserve(), yAmount);
+        assertEq(miniAMM.k(), xAmount * yAmount);
 
         vm.stopPrank();
     }
