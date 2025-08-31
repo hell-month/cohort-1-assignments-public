@@ -80,27 +80,43 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
 
     // complete the function >> this is for tradding
     function swap(uint256 xAmountIn, uint256 yAmountIn) external {
-        require(
-            (xAmountIn == 0 && yAmountIn > 0) || (xAmountIn > 0 && yAmountIn == 0),
-            "Can only swap one direction at a time"
-        );
+        if( xReserve == 0 && yReserve == 0 && k ==0) {
+            revert("No liquidity in pool");
+        }
 
+        if( xAmountIn != 0  &&  yAmountIn  != 0) {
+            revert("Can only swap one direction at a time") ;
+        }
+
+        if( xAmountIn == 0  &&  yAmountIn  == 0) {
+            revert("Must swap at least one token") ;
+        }
+
+        if (xAmountIn > xReserve || yAmountIn > yReserve) {
+            revert("Insufficient liquidity");
+        }
         uint256 xAmountReturn = 0;
         uint256 yAmountReturn = 0;
 
         if (yAmountIn == 0) {
-            IERC20(tokenX).transferFrom(msg.sender, address(this), xAmountIn);
             xReserve += xAmountIn;
             yAmountReturn = yReserve - (k / xReserve);
-            IERC20(tokenY).transfer(msg.sender, yAmountReturn);
+            if (yAmountReturn > yReserve) {
+                revert("Insufficient liquidity");
+            }
             yReserve -= yAmountReturn;
+            IERC20(tokenX).transferFrom(msg.sender, address(this), xAmountIn);
+            IERC20(tokenY).transfer(msg.sender, yAmountReturn);
             emit Swap(xAmountIn, yAmountReturn);
         } else {
-            IERC20(tokenY).transferFrom(msg.sender, address(this), yAmountIn);
-            yReserve += yAmountIn;
+           yReserve += yAmountIn;
             xAmountReturn = xReserve - (k / yReserve);
-            IERC20(tokenX).transfer(msg.sender, xAmountReturn);
+            if (xAmountReturn > xReserve) {
+                revert("Insufficient liquidity");
+            }
             xReserve -= xAmountReturn;
+            IERC20(tokenY).transferFrom(msg.sender, address(this), yAmountIn);
+            IERC20(tokenX).transfer(msg.sender, xAmountReturn);
             emit Swap(xAmountReturn, yAmountIn);
         }
 
