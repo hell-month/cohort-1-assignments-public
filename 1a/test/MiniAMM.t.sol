@@ -66,10 +66,12 @@ contract MiniAMMTest is Test {
 
     function test_ConstructorTokenOrdering() public {
         // Test that tokens are ordered correctly (tokenX < tokenY)
+        // EVM은 새 컨트랙트를 배포할 때 주소를 자동으로 할당 A 가 B 보다 먼저 배포 되었기 때문에 주소가 항상 A 가 앞이다.
         MockERC20 tokenA = new MockERC20("Token A", "TKA");
         MockERC20 tokenB = new MockERC20("Token B", "TKB");
 
         MiniAMM amm1 = new MiniAMM(address(tokenA), address(tokenB));
+
         assertEq(amm1.tokenX(), address(tokenA));
         assertEq(amm1.tokenY(), address(tokenB));
 
