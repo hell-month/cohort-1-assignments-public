@@ -62,7 +62,7 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
 
     // complete the function
     function addLiquidity(uint256 xAmountIn, uint256 yAmountIn) external {
-        // amount check
+        // check amount is zero
         if(xAmountIn == 0 || yAmountIn == 0) {
             revert("Amounts must be greater than 0");
         }
@@ -80,7 +80,30 @@ contract MiniAMM is IMiniAMM, IMiniAMMEvents {
 
     // complete the function >> this is for tradding
     function swap(uint256 xAmountIn, uint256 yAmountIn) external {
+        require(
+            (xAmountIn == 0 && yAmountIn > 0) || (xAmountIn > 0 && yAmountIn == 0),
+            "Can only swap one direction at a time"
+        );
 
-        emit Swap(xAmountIn, yAmountIn);
+        uint256 xAmountReturn = 0;
+        uint256 yAmountReturn = 0;
+
+        if (yAmountIn == 0) {
+            IERC20(tokenX).transferFrom(msg.sender, address(this), xAmountIn);
+            xReserve += xAmountIn;
+            yAmountReturn = yReserve - (k / xReserve);
+            IERC20(tokenY).transfer(msg.sender, yAmountReturn);
+            yReserve -= yAmountReturn;
+            emit Swap(xAmountIn, yAmountReturn);
+        } else {
+            IERC20(tokenY).transferFrom(msg.sender, address(this), yAmountIn);
+            yReserve += yAmountIn;
+            xAmountReturn = xReserve - (k / yReserve);
+            IERC20(tokenX).transfer(msg.sender, xAmountReturn);
+            xReserve -= xAmountReturn;
+            emit Swap(xAmountReturn, yAmountIn);
+        }
+
     }
+
 }
