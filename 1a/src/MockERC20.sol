@@ -20,5 +20,6 @@ contract MockERC20 is ERC20, IMockERC20 {
     // Implement
     function freeMintToSender(uint256 amount) external {
         _mint(msg.sender,amount);
+        // msg.sender → 현재 함수(트랜잭션)를 호출한 계정 주소 , 일반 계정(EOA)일 수도 있고 다른 컨트랙트일 수도 있음
     }
 }
