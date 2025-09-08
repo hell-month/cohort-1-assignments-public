@@ -16,8 +16,11 @@ contract MiniAMMScript is Script {
         vm.startBroadcast();
 
         // Deploy mock ERC20 tokens
+        token0 = new MockERC20("Token0", "T0");
+        token1 = new MockERC20("Token1", "T1");
 
         // Deploy MiniAMM with the tokens
+        miniAMM = new MiniAMM(address(token0), address(token1));
 
         vm.stopBroadcast();
     }
