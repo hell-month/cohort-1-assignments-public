@@ -1,0 +1,15 @@
+2025-09-08T14:13:10.127 application=api [debug] Current API rate limit by key nil reqs/sec
+2025-09-08T14:13:10.128 application=api [debug] Current API rate limit by IP nil reqs/sec
+2025-09-08T15:10:30.122 application=api [debug] Current API rate limit by key nil reqs/sec
+2025-09-08T15:10:30.123 application=api [debug] Current API rate limit by IP nil reqs/sec
+2025-09-09T13:05:17.774 application=api [debug] Current API rate limit by key nil reqs/sec
+2025-09-09T13:05:17.774 application=api [debug] Current API rate limit by IP nil reqs/sec
+2025-09-09T13:07:12.651 application=api request_id=GGOfHm4oR2B5EzUABd0C [info] Sent 400 in 120µs on GET /api/v1/pages/main?
+2025-09-09T13:07:13.988 application=api request_id=GGOfHr2jjEJpNXwABiXB [info] Sent 400 in 153µs on GET /api/v1/pages/main?
+2025-09-09T13:07:16.198 application=api request_id=GGOfH0E74P0q-pwAAGvE [info] Sent 400 in 1ms on GET /api/v1/pages/main?
+2025-09-09T13:12:24.626 application=api request_id=GGOfZxFeSnhvVCwAAHxF [info] Sent 400 in 95µs on GET /api/v1/pages/main?
+2025-09-09T13:12:25.782 application=api request_id=GGOfZ1Y_KxN8Ub0AAMTk [info] Sent 400 in 136µs on GET /api/v1/pages/main?
+2025-09-09T13:12:27.984 application=api request_id=GGOfZ9l1DdIIbjEAAMUk [info] Sent 400 in 220µs on GET /api/v1/pages/main?
+2025-09-09T13:12:33.628 application=api request_id=GGOfaSnnkfD_cMcABqJB [info] Sent 400 in 56µs on GET /api/v1/pages/main?
+2025-09-09T13:12:34.777 application=api request_id=GGOfaW5eNmsTwysAAMak [info] Sent 400 in 257µs on GET /api/v1/pages/main?
+2025-09-09T13:12:36.900 application=api request_id=GGOfaezv9hTUZYoABjui [info] Sent 400 in 89µs on GET /api/v1/pages/main?

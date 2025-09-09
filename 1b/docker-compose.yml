@@ -1,15 +1,152 @@
-version: "3.8"
+version: '3.8'
 
-# services:
-  # caddy:
-  # ngrok:
-  # sc-deployer:
-  # sc-deployment-server:
-  # geth:
-  # geth-init:
-  # graph-ipfs:
-  # graph-postgres:
-  # graph-redis:
-  # graph-node:
+services:
+  caddy:
+    image: caddy:2.7-alpine
+    container_name: caddy
+    ports:
+      - '8082:80'
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - geth
+    networks:
+      - geth-network
+  sc-deployer:
+    build: ./sc-deployer
+    platform: linux/arm64
+    container_name: sc-deployer
+    user: root
+    volumes:
+      - ./sc-deployer:/workspace
+      - ./geth-init:/shared
+    working_dir: /workspace
+    entrypoint: ['/bin/sh', '/workspace/entrypoint.sh']
+    depends_on:
+      - geth
+    networks:
+      - geth-network
+  sc-deployment-server:
+    image: caddy:2.7-alpine
+    container_name: sc-deployment-server
+    ports:
+      - '8083:80'
+    volumes:
+      - ./sc-deployment-server/Caddyfile:/etc/caddy/Caddyfile
+      # serve deployment.json
+      - ./sc-deployer:/usr/share/caddy
+    depends_on:
+      - sc-deployer
+    networks:
+      - geth-network
+  geth:
+    image: ethereum/client-go:v1.15.0
+    container_name: geth
+    ports:
+      - '8545:8545' # HTTP RPC
+      - '8546:8546' # WebSocket RPC
+      - '30303:30303' # P2P
+      - '30303:30303/udp' # P2P UDP
+    volumes:
+      - geth-data:/root/.ethereum
+      - ./geth:/geth
+    command: >
+      --dev
+      --datadir /root/.ethereum
+      --http
+      --http.addr 0.0.0.0
+      --http.port 8545
+      --http.corsdomain "*"
+      --http.vhosts "*"
+      --http.api "eth,net,web3,personal,miner,admin,debug"
+      --ws
+      --ws.addr 0.0.0.0
+      --ws.port 8546
+      --ws.api "eth,net,web3,personal,miner,admin,debug"
+      --ws.origins "*"
+      --allow-insecure-unlock
+      --mine
+      --networkid 1337
+      --nodiscover
+      --verbosity 3
+      --miner.gaslimit 8000000
+    restart: unless-stopped
+    networks:
+      - geth-network
+  geth-init:
+    image: ethereum/client-go:v1.15.0
+    container_name: geth-init
+    volumes:
+      - ./geth-init:/scripts
+      - geth-data:/root/.ethereum
+      - ./geth-init:/shared
+    entrypoint: ['/bin/sh', '/scripts/entrypoint.sh']
+    depends_on:
+      - geth
+    networks:
+      - geth-network
+  graph-ipfs:
+    image: ipfs/kubo:latest
+    container_name: graph-ipfs
+    ports:
+      - '5001:5001' # host에서 graph-cli가 접근해야 하므로 노출
+    command: ['daemon', '--migrate=true']
+    volumes:
+      - graph-ipfs-data:/data/ipfs
+    networks:
+      - geth-network
+
+  graph-postgres:
+    image: postgres:14
+    container_name: graph-postgres
+    environment:
+      POSTGRES_USER: graph
+      POSTGRES_PASSWORD: letmein
+      POSTGRES_DB: graph
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --lc-collate=C --lc-ctype=C'
+    volumes:
+      - graph-pg-data:/var/lib/postgresql/data
+    networks:
+      - geth-network
+
+  graph-redis:
+    image: redis:7-alpine
+    container_name: graph-redis
+    command: ['redis-server', '--appendonly', 'yes']
+    networks:
+      - geth-network
+
+  graph-node:
+    image: graphprotocol/graph-node:v0.33.0
+    platform: linux/amd64
+    container_name: graph-node
+    depends_on:
+      - graph-postgres
+      - graph-ipfs
+      - geth
+    environment:
+      postgres_host: graph-postgres
+      postgres_user: graph
+      postgres_pass: letmein
+      postgres_db: graph
+      ipfs: http://graph-ipfs:5001
+      ethereum: dev:http://geth:8545
+      RUST_LOG: info
+      GRAPH_LOG: info
+    ports:
+      - '8000:8000' # GraphQL + GraphiQL
+      - '8020:8020' # graph-cli (admin RPC)
+      - '8001:8001' # status (옵션)
+    networks:
+      - geth-network
 
   # blockscout: should be another docker-compose.yml file from https://github.com/blockscout/blockscout/tree/master/docker-compose. Don't create a container in this file.
+
+volumes:
+  geth-data:
+  graph-ipfs-data:
+  graph-pg-data:
+
+networks:
+  geth-network:
+    driver: bridge

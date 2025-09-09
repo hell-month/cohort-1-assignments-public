@@ -1,0 +1,89 @@
+{
+    auto_https off
+}
+
+(cors) {
+    @cors_preflight* method OPTIONS
+    @cors* header Origin *
+
+    handle @cors_preflight* {
+        header {
+            Access-Control-Allow-Origin "*"
+            Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+            Access-Control-Allow-Headers *
+            Access-Control-Max-Age "3600"
+            defer # turn on defer on your header directive to make sure the new header values are set after proxying
+        }
+        respond "" 204
+    }
+
+    handle @cors* {
+        header {
+            Access-Control-Allow-Origin "*"
+            Access-Control-Expose-Headers *
+            defer
+        }
+    }
+}
+
+:80 {
+    import cors
+
+    handle /deployment* {
+        reverse_proxy sc-deployment-server:80
+    }
+
+    # Explorer (Blockscout) under /explorer path
+    handle /explorer* {
+        uri strip_prefix /explorer
+        reverse_proxy proxy:80
+    }
+
+    # Blockscout API
+    handle /api* {
+        reverse_proxy proxy:80
+    }
+
+    # Blockscout WebSocket (Phoenix socket)
+    handle /socket* {
+        reverse_proxy proxy:80
+    }
+
+    # (선택) 통계 프록시
+    handle /explorer-stats* {
+        uri strip_prefix /explorer-stats
+        reverse_proxy proxy:8080
+    }
+
+    # Blockscout static resources (needed for subpath routing)
+    handle /assets/* {
+        reverse_proxy proxy:80
+    }
+
+    handle /_next/* {
+        reverse_proxy proxy:80
+    }
+
+    handle /icons/* {
+        reverse_proxy proxy:80
+    }
+
+    handle /static/* {
+        reverse_proxy proxy:80
+    }
+
+    handle /rpc* {
+        uri strip_prefix /rpc
+        reverse_proxy geth:8545
+    }
+
+    # Graph node GraphQL playground
+    handle /graph-playground* {
+        uri strip_prefix /graph-playground
+        reverse_proxy graph-node:8000
+    }
+
+    handle {
+        reverse_proxy geth:8545
+    }
+}
