@@ -14,6 +14,7 @@ contract MockERC20Test is Test {
     }
 
     function test_Constructor() public view {
+        // assertEq 두 값이 같은지 확인
         assertEq(token.name(), "Mock Token");
         assertEq(token.symbol(), "MTK");
         assertEq(token.decimals(), 18);

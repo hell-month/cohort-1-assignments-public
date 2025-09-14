@@ -2,3 +2,9 @@
 geth-init-complete
 sc-deployer/deployment.json
 cohort-1-assignments-public
+
+# Blockscout runtime data (do not commit)
+# postgres, redis, logs, dets
+/blockscout/docker-compose/services/*-data/
+/blockscout/docker-compose/services/logs/
+/blockscout/docker-compose/services/dets/
