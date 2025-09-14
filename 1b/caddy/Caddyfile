@@ -1,0 +1,44 @@
+{
+    auto_https off
+}
+
+(cors) {
+    @cors_preflight* method OPTIONS
+    @cors* header Origin *
+
+    handle @cors_preflight* {
+        header {
+            Access-Control-Allow-Origin "*"
+            Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+            Access-Control-Allow-Headers *
+            Access-Control-Max-Age "3600"
+            defer # turn on defer on your header directive to make sure the new header values are set after proxying
+        }
+        respond "" 204
+    }
+
+    handle @cors* {
+        header {
+            Access-Control-Allow-Origin "*"
+            Access-Control-Expose-Headers *
+            defer
+        }
+    }
+}
+
+:80 {
+    import cors
+    
+    handle /deployment.json {
+        reverse_proxy sc-deployment-server:80
+    }
+    
+    handle /rpc* {
+        uri strip_prefix /rpc
+        reverse_proxy geth:8545
+    }
+    
+    handle {
+        reverse_proxy geth:8545
+    }
+}
